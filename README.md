@@ -17,6 +17,7 @@ An interactive resume builder with LaTeX export, section variants, and job posti
 - **Backend**: Django + Django REST Framework
 - **Frontend**: Next.js with TypeScript and Tailwind CSS
 - **PDF Generation**: LaTeX
+- **Reverse Proxy**: Nginx (routes requests to appropriate services)
 - **Containerization**: Docker + Docker Compose
 
 ## Setup Instructions
@@ -37,8 +38,9 @@ docker compose up -d
 ```
 
 2. The application will be available at:
-   - Frontend: `http://localhost:3000`
-   - Backend API: `http://localhost:8000/api/`
+   - Full Application: `http://localhost:80` (or just `http://localhost`)
+   - Backend API: `http://localhost:80/api/`
+   - Admin Interface: `http://localhost:80/admin/`
 
 3. View logs:
 ```bash
@@ -46,6 +48,7 @@ make logs
 # Or for specific services:
 make logs-backend
 make logs-frontend
+make logs-nginx
 ```
 
 4. Stop the development environment:
@@ -104,7 +107,7 @@ DEBUG=0 ALLOWED_HOSTS=yourdomain.com docker compose -f docker-compose.prod.yml u
 
 3. **Network Issues**: If you encounter network issues during Docker build, ensure your firewall settings allow Docker to access external repositories.
 
-4. **Port Conflicts**: If ports 3000 or 8000 are already in use, you can modify the port mappings in the docker-compose files.
+4. **Port Conflicts**: If port 80 is already in use, you can modify the port mapping in the docker-compose files by changing `"80:80"` to `"8080:80"` (or another available port) in the nginx service configuration.
 
 5. **Permissions**: On Linux, you may need to run Docker commands with `sudo` or add your user to the `docker` group.
 
