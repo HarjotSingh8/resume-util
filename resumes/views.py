@@ -10,6 +10,7 @@ from .serializers import (
 import subprocess
 import tempfile
 import os
+import shutil
 from django.http import HttpResponse
 
 
@@ -44,23 +45,65 @@ class ResumeViewSet(viewsets.ModelViewSet):
         resume = self.get_object()
         latex_content = self._generate_latex_content(resume)
         
-        try:
-            # Create temporary file
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.tex', delete=False) as f:
-                f.write(latex_content)
-                tex_file = f.name
-            
-            # Generate PDF (this would require pdflatex to be installed)
-            # For now, we'll just return the LaTeX content
-            pdf_content = f"PDF generation not implemented yet. LaTeX content:\n\n{latex_content}"
-            
-            return Response({'pdf_content': pdf_content})
+        tex_file = None
+        pdf_file = None
+        temp_dir = None
         
+        try:
+            # Create temporary directory for LaTeX compilation
+            temp_dir = tempfile.mkdtemp()
+            tex_file = os.path.join(temp_dir, 'resume.tex')
+            pdf_file = os.path.join(temp_dir, 'resume.pdf')
+            
+            # Write LaTeX content to file
+            with open(tex_file, 'w', encoding='utf-8') as f:
+                f.write(latex_content)
+            
+            # Run pdflatex to generate PDF
+            result = subprocess.run([
+                'pdflatex', 
+                '-interaction=nonstopmode',
+                '-output-directory', temp_dir,
+                tex_file
+            ], capture_output=True, text=True, timeout=30)
+            
+            if result.returncode != 0:
+                return Response({
+                    'error': 'LaTeX compilation failed',
+                    'details': result.stderr,
+                    'latex_content': latex_content
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            # Check if PDF was generated
+            if not os.path.exists(pdf_file):
+                return Response({
+                    'error': 'PDF file was not generated',
+                    'latex_content': latex_content
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            # Read PDF content and return as binary response
+            with open(pdf_file, 'rb') as f:
+                pdf_content = f.read()
+            
+            response = HttpResponse(pdf_content, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{resume.title.replace(" ", "_")}.pdf"'
+            return response
+            
+        except subprocess.TimeoutExpired:
+            return Response({
+                'error': 'PDF generation timed out',
+                'latex_content': latex_content
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({
+                'error': f'PDF generation failed: {str(e)}',
+                'latex_content': latex_content
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         finally:
-            if 'tex_file' in locals():
-                os.unlink(tex_file)
+            # Clean up temporary files
+            if temp_dir and os.path.exists(temp_dir):
+                import shutil
+                shutil.rmtree(temp_dir)
     
     def _generate_latex_content(self, resume):
         """Generate LaTeX content from resume data"""
