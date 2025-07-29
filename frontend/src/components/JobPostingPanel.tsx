@@ -18,7 +18,11 @@ export function JobPostingPanel({ resume, onResumeUpdate }: JobPostingPanelProps
     description: '',
     requirements: '',
   });
-  const [analysis, setAnalysis] = useState<any>(null);
+  const [analysis, setAnalysis] = useState<{
+    found_keywords: string[];
+    recommended_sections: string[];
+    match_score: number;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -67,7 +71,7 @@ export function JobPostingPanel({ resume, onResumeUpdate }: JobPostingPanelProps
       const lines = text.split('\n').filter(line => line.trim());
       let title = '';
       let company = '';
-      let description = text;
+      const description = text;
       
       // Try to extract title and company from common patterns
       if (lines.length > 0) {

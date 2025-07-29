@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Resume, Section, apiService } from '@/lib/api';
 import { SortableSection } from './SortableSection';
@@ -36,12 +36,12 @@ export function SectionEditor({ resume, onResumeUpdate }: SectionEditorProps) {
     })
   );
 
-  const handleDragEnd = async (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
-      const oldIndex = sections.findIndex((section) => section.id === active.id);
-      const newIndex = sections.findIndex((section) => section.id === over.id);
+    if (active.id !== over?.id) {
+      const oldIndex = sections.findIndex((section) => section.id === Number(active.id));
+      const newIndex = sections.findIndex((section) => section.id === Number(over?.id));
 
       const newSections = arrayMove(sections, oldIndex, newIndex);
       setSections(newSections);

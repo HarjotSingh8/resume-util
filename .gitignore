@@ -38,3 +38,8 @@ Thumbs.db
 *.tmp
 *.temp
 test-nginx.sh
+
+# Test PDF files
+test.pdf
+docker-test.pdf
+final-test.pdf

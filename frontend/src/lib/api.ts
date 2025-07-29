@@ -175,7 +175,11 @@ class ApiService {
     });
   }
 
-  async analyzeJobPosting(id: number): Promise<any> {
+  async analyzeJobPosting(id: number): Promise<{
+    found_keywords: string[];
+    recommended_sections: string[];
+    match_score: number;
+  }> {
     return this.request(`/job-postings/${id}/analyze/`, {
       method: 'POST',
     });
