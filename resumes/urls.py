@@ -6,6 +6,7 @@ router = DefaultRouter()
 router.register(r'resumes', views.ResumeViewSet, basename='resume')
 router.register(r'sections', views.SectionViewSet, basename='section')
 router.register(r'section-items', views.SectionItemViewSet, basename='sectionitem')
+router.register(r'sub-items', views.SubItemViewSet, basename='subitem')
 router.register(r'job-postings', views.JobPostingViewSet, basename='jobposting')
 
 urlpatterns = [

@@ -27,6 +27,15 @@ export interface SectionItem {
   location: string;
   order: number;
   is_included: boolean;
+  subitems: SubItem[];
+}
+
+export interface SubItem {
+  id: number;
+  content: string;
+  order: number;
+  is_included: boolean;
+  section_item: number;
 }
 
 export interface JobPosting {
@@ -159,6 +168,37 @@ class ApiService {
 
   async deleteSectionItem(id: number): Promise<void> {
     return this.request(`/section-items/${id}/`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Sub Item endpoints
+  async getSubItems(sectionItemId: number): Promise<SubItem[]> {
+    return this.request(`/sub-items/?section_item_id=${sectionItemId}`);
+  }
+
+  async createSubItem(sectionItemId: number, data: Partial<SubItem>): Promise<SubItem> {
+    return this.request('/sub-items/', {
+      method: 'POST',
+      body: JSON.stringify({ ...data, section_item: sectionItemId }),
+    });
+  }
+
+  async updateSubItem(id: number, data: Partial<SubItem>): Promise<SubItem> {
+    return this.request(`/sub-items/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async toggleSubItem(id: number): Promise<SubItem> {
+    return this.request(`/sub-items/${id}/toggle_include/`, {
+      method: 'PATCH',
+    });
+  }
+
+  async deleteSubItem(id: number): Promise<void> {
+    return this.request(`/sub-items/${id}/`, {
       method: 'DELETE',
     });
   }

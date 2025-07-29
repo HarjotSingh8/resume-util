@@ -1,11 +1,19 @@
 from rest_framework import serializers
-from .models import Resume, Section, SectionItem, JobPosting, ResumeJobMatch
+from .models import Resume, Section, SectionItem, SubItem, JobPosting, ResumeJobMatch
+
+
+class SubItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubItem
+        fields = ['id', 'content', 'order', 'is_included', 'section_item']
 
 
 class SectionItemSerializer(serializers.ModelSerializer):
+    subitems = SubItemSerializer(many=True, read_only=True)
+    
     class Meta:
         model = SectionItem
-        fields = ['id', 'content', 'subtitle', 'date_range', 'location', 'order', 'is_included', 'section']
+        fields = ['id', 'content', 'subtitle', 'date_range', 'location', 'order', 'is_included', 'section', 'subitems']
 
 
 class SectionSerializer(serializers.ModelSerializer):

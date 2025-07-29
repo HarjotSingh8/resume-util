@@ -58,6 +58,20 @@ class SectionItem(models.Model):
         return f"{self.content[:50]}..." if len(self.content) > 50 else self.content
 
 
+class SubItem(models.Model):
+    """Sub-items/bullet points that belong to a SectionItem"""
+    section_item = models.ForeignKey(SectionItem, on_delete=models.CASCADE, related_name='subitems')
+    content = models.TextField(help_text="Bullet point or sub-item content")
+    order = models.PositiveIntegerField(default=0)
+    is_included = models.BooleanField(default=True, help_text="Whether this sub-item is included in the current version")
+    
+    class Meta:
+        ordering = ['order']
+    
+    def __str__(self):
+        return f"{self.content[:50]}..." if len(self.content) > 50 else self.content
+
+
 class JobPosting(models.Model):
     """Stores job postings for analysis and suggestions"""
     title = models.CharField(max_length=200)

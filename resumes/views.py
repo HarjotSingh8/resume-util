@@ -2,10 +2,10 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from .models import Resume, Section, SectionItem, JobPosting, ResumeJobMatch
+from .models import Resume, Section, SectionItem, SubItem, JobPosting, ResumeJobMatch
 from .serializers import (
     ResumeSerializer, ResumeCreateSerializer, SectionSerializer, 
-    SectionItemSerializer, JobPostingSerializer, ResumeJobMatchSerializer
+    SectionItemSerializer, SubItemSerializer, JobPostingSerializer, ResumeJobMatchSerializer
 )
 import subprocess
 import tempfile
@@ -220,6 +220,26 @@ class SectionItemViewSet(viewsets.ModelViewSet):
         item.is_included = not item.is_included
         item.save()
         serializer = self.get_serializer(item)
+        return Response(serializer.data)
+
+
+class SubItemViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing sub-items"""
+    serializer_class = SubItemSerializer
+    
+    def get_queryset(self):
+        section_item_id = self.request.query_params.get('section_item_id')
+        if section_item_id:
+            return SubItem.objects.filter(section_item_id=section_item_id)
+        return SubItem.objects.all()
+    
+    @action(detail=True, methods=['patch'])
+    def toggle_include(self, request, pk=None):
+        """Toggle the is_included status of a sub-item"""
+        subitem = self.get_object()
+        subitem.is_included = not subitem.is_included
+        subitem.save()
+        serializer = self.get_serializer(subitem)
         return Response(serializer.data)
 
 
