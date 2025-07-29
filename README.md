@@ -10,14 +10,107 @@ An interactive resume builder with LaTeX export, section variants, and job posti
 - **LaTeX Export**: Generate professional LaTeX/PDF output
 - **Job Matching**: Paste job postings and get suggestions for what to include
 - **Section Variants**: Create different versions of sections for different job applications
+- **Containerized**: Fully dockerized for easy development and deployment
 
 ## Technology Stack
 
 - **Backend**: Django + Django REST Framework
 - **Frontend**: Next.js with TypeScript and Tailwind CSS
 - **PDF Generation**: LaTeX
+- **Containerization**: Docker + Docker Compose
 
 ## Setup Instructions
+
+### Using Docker (Recommended)
+
+#### Development Environment
+
+1. Build and start the development environment:
+```bash
+make build && make up
+```
+
+Or using Docker Compose directly:
+```bash
+docker compose build
+docker compose up -d
+```
+
+2. The application will be available at:
+   - Frontend: `http://localhost:3000`
+   - Backend API: `http://localhost:8000/api/`
+
+3. View logs:
+```bash
+make logs
+# Or for specific services:
+make logs-backend
+make logs-frontend
+```
+
+4. Stop the development environment:
+```bash
+make down
+```
+
+#### Production Environment
+
+1. Build and start the production environment:
+```bash
+make prod-build && make prod-up
+```
+
+Or using Docker Compose directly:
+```bash
+docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml up -d
+```
+
+### Environment Variables
+
+For production deployment, you can customize the following environment variables:
+
+- `DEBUG` - Set to `0` for production (default: `1` for development)
+- `ALLOWED_HOSTS` - Comma-separated list of allowed hosts (e.g., `example.com,www.example.com`)
+- `DJANGO_SETTINGS_MODULE` - Django settings module (default: `backend.settings`)
+
+Example production deployment with custom settings:
+```bash
+DEBUG=0 ALLOWED_HOSTS=yourdomain.com docker compose -f docker-compose.prod.yml up -d
+```
+
+#### Docker Commands
+
+- `make help` - Show all available commands
+- `make build` - Build all Docker images
+- `make up` - Start development environment
+- `make down` - Stop development environment
+- `make logs` - Show logs from all services
+- `make clean` - Remove all containers and images
+- `make restart` - Restart development environment
+
+#### Troubleshooting Docker Setup
+
+1. **Check Docker Installation**:
+   ```bash
+   docker --version
+   docker compose version
+   ```
+
+2. **Validate Configuration**:
+   ```bash
+   ./validate-docker.sh
+   ```
+
+3. **Network Issues**: If you encounter network issues during Docker build, ensure your firewall settings allow Docker to access external repositories.
+
+4. **Port Conflicts**: If ports 3000 or 8000 are already in use, you can modify the port mappings in the docker-compose files.
+
+5. **Permissions**: On Linux, you may need to run Docker commands with `sudo` or add your user to the `docker` group.
+
+### Manual Setup (Alternative)
+
+If you prefer to run without Docker:
 
 ### Backend (Django)
 
