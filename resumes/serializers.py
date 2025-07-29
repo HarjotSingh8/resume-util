@@ -5,7 +5,7 @@ from .models import Resume, Section, SectionItem, JobPosting, ResumeJobMatch
 class SectionItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = SectionItem
-        fields = ['id', 'content', 'subtitle', 'date_range', 'location', 'order', 'is_included']
+        fields = ['id', 'content', 'subtitle', 'date_range', 'location', 'order', 'is_included', 'section']
 
 
 class SectionSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class SectionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Section
-        fields = ['id', 'title', 'section_type', 'order', 'is_enabled', 'variant_name', 'items']
+        fields = ['id', 'title', 'section_type', 'order', 'is_enabled', 'variant_name', 'items', 'resume']
 
 
 class ResumeSerializer(serializers.ModelSerializer):
