@@ -85,10 +85,26 @@ class ApiService {
     });
   }
 
-  async generatePdf(resumeId: number): Promise<{ pdf_content: string }> {
-    return this.request(`/resumes/${resumeId}/generate_pdf/`, {
+  async generatePdf(resumeId: number): Promise<Blob> {
+    const url = `${API_BASE_URL}/resumes/${resumeId}/generate_pdf/`;
+    const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    if (!response.ok) {
+      // Try to get error details from JSON response
+      try {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `PDF generation failed: ${response.statusText}`);
+      } catch {
+        throw new Error(`PDF generation failed: ${response.statusText}`);
+      }
+    }
+
+    return response.blob();
   }
 
   // Section endpoints
@@ -159,7 +175,11 @@ class ApiService {
     });
   }
 
-  async analyzeJobPosting(id: number): Promise<any> {
+  async analyzeJobPosting(id: number): Promise<{
+    found_keywords: string[];
+    recommended_sections: string[];
+    match_score: number;
+  }> {
     return this.request(`/job-postings/${id}/analyze/`, {
       method: 'POST',
     });
