@@ -1,9 +1,6 @@
 # Development Dockerfile for Next.js with hot reload
 FROM node:20-alpine
 
-# Install libc6-compat for alpine
-RUN apk add --no-cache libc6-compat
-
 WORKDIR /app
 
 # Copy package files
