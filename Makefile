@@ -24,6 +24,9 @@ logs-backend: ## Show backend logs
 logs-frontend: ## Show frontend logs
 	docker compose logs -f frontend
 
+logs-nginx: ## Show nginx logs
+	docker compose logs -f nginx
+
 prod-up: ## Start production environment
 	docker compose -f docker-compose.prod.yml up -d
 
@@ -32,6 +35,18 @@ prod-down: ## Stop production environment
 
 prod-build: ## Build production images
 	docker compose -f docker-compose.prod.yml build
+
+prod-logs: ## Show production logs
+	docker compose -f docker-compose.prod.yml logs -f
+
+prod-logs-backend: ## Show production backend logs
+	docker compose -f docker-compose.prod.yml logs -f backend
+
+prod-logs-frontend: ## Show production frontend logs
+	docker compose -f docker-compose.prod.yml logs -f frontend
+
+prod-logs-nginx: ## Show production nginx logs
+	docker compose -f docker-compose.prod.yml logs -f nginx
 
 clean: ## Remove all containers and images
 	docker compose down -v --rmi all --remove-orphans

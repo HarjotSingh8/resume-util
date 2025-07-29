@@ -48,6 +48,7 @@ make logs
 # Or for specific services:
 make logs-backend
 make logs-frontend
+make logs-nginx
 ```
 
 4. Stop the development environment:
