@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { SectionItem, apiService } from '@/lib/api';
-import { Check, X, Edit2, Trash2 } from 'lucide-react';
+import { Check, X, Edit2, Trash2, Plus } from 'lucide-react';
+import { SubItemComponent } from './SubItem';
 
 interface SectionItemProps {
   item: SectionItem;
@@ -15,6 +16,8 @@ export function SectionItemComponent({ item, onUpdate }: SectionItemProps) {
   const [subtitle, setSubtitle] = useState(item.subtitle);
   const [dateRange, setDateRange] = useState(item.date_range);
   const [location, setLocation] = useState(item.location);
+  const [isAddingSubItem, setIsAddingSubItem] = useState(false);
+  const [newSubItemContent, setNewSubItemContent] = useState('');
 
   const handleToggleInclude = async () => {
     try {
@@ -56,6 +59,23 @@ export function SectionItemComponent({ item, onUpdate }: SectionItemProps) {
       } catch (error) {
         console.error('Failed to delete item:', error);
       }
+    }
+  };
+
+  const handleAddSubItem = async () => {
+    if (!newSubItemContent.trim()) return;
+
+    try {
+      await apiService.createSubItem(item.id, {
+        content: newSubItemContent.trim(),
+        order: item.subitems.length,
+        is_included: true,
+      });
+      setNewSubItemContent('');
+      setIsAddingSubItem(false);
+      onUpdate();
+    } catch (error) {
+      console.error('Failed to create sub-item:', error);
     }
   };
 
@@ -171,6 +191,63 @@ export function SectionItemComponent({ item, onUpdate }: SectionItemProps) {
             <Trash2 className="h-3 w-3" />
           </button>
         </div>
+      </div>
+      
+      {/* Sub-items */}
+      <div className="mt-4 space-y-2">
+        {item.subitems && item.subitems.map((subitem) => (
+          <SubItemComponent
+            key={subitem.id}
+            subitem={subitem}
+            onUpdate={onUpdate}
+          />
+        ))}
+        
+        {/* Add sub-item */}
+        {!isAddingSubItem ? (
+          <button
+            onClick={() => setIsAddingSubItem(true)}
+            className="ml-6 flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-blue-600 border border-dashed border-gray-300 rounded-md hover:border-blue-300 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add bullet point</span>
+          </button>
+        ) : (
+          <div className="ml-6 border border-gray-200 rounded-md p-3 bg-gray-50">
+            <div className="space-y-3">
+              <textarea
+                value={newSubItemContent}
+                onChange={(e) => setNewSubItemContent(e.target.value)}
+                placeholder="Bullet point content"
+                rows={2}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleAddSubItem())}
+                autoFocus
+              />
+              
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => {
+                    setIsAddingSubItem(false);
+                    setNewSubItemContent('');
+                  }}
+                  className="flex items-center space-x-1 px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+                >
+                  <X className="h-3 w-3" />
+                  <span>Cancel</span>
+                </button>
+                <button
+                  onClick={handleAddSubItem}
+                  disabled={!newSubItemContent.trim()}
+                  className="flex items-center space-x-1 px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
+                >
+                  <Check className="h-3 w-3" />
+                  <span>Add</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
